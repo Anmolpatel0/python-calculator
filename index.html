@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#111827,#1f2937);padding:24px}
+.container{width:360px;max-width:100%}
+.calculator{background:#181818;padding:22px;border-radius:28px;box-shadow:0 25px 60px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.08)}
+.brand{color:#aaa;font-size:13px;letter-spacing:2px;text-align:center;margin-bottom:12px}
+.display{height:105px;background:#080808;border-radius:18px;padding:15px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;margin-bottom:18px;box-shadow:inset 0 3px 8px rgba(0,0,0,.7);overflow:hidden}
+.previous{color:#777;fxont-size:16px;min-height:24px}.current{color:white;font-size:38px;font-weight:500;word-break:break-all}
+.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+button{height:65px;border:none;border-radius:50%;font-size:21px;font-weight:500;cursor:pointer;color:white;background:#303030;box-shadow:0 4px 0 #171717,0 6px 10px rgba(0,0,0,.3);transition:.12s}
+button:hover{filter:brightness(1.18)}button:active{transform:translateY(4px);box-shadow:0 1px 0 #171717}
+.function{background:#a5a5a5;color:#111}.operator,.equals{background:#ff9500}.zero{grid-column:span 2;border-radius:35px}
+.converter{margin-top:18px;background:#222;padding:18px;border-radius:18px}.converter h3{color:white;font-size:15px;margin-bottom:12px}
+select,input{width:100%;padding:12px;margin-bottom:10px;border:none;border-radius:10px;background:#333;color:white;outline:none}
+.convert-btn{width:100%;height:44px;border-radius:10px;background:#ff9500;font-size:15px}
+.result{color:#aaa;margin-top:10px;text-align:center;font-size:14px}.footer{text-align:center;color:#666;font-size:11px;margin-top:15px}
+</style>
+</head>
+<body>
+<div class="container"><div class="calculator">
+<div class="brand">PYTHON CALCULATOR</div>
+<div class="display"><div class="previous" id="previous"></div><div class="current" id="display">0</div></div>
+<div class="buttons">
+<button class="function" onclick="clearCalculator()">AC</button><button class="function" onclick="deleteNumber()">⌫</button><button class="function" onclick="addNumber('%')">%</button><button class="operator" onclick="setOperator('/')">÷</button>
+<button onclick="addNumber('7')">7</button><button onclick="addNumber('8')">8</button><button onclick="addNumber('9')">9</button><button class="operator" onclick="setOperator('*')">×</button>
+<button onclick="addNumber('4')">4</button><button onclick="addNumber('5')">5</button><button onclick="addNumber('6')">6</button><button class="operator" onclick="setOperator('-')">−</button>
+<button onclick="addNumber('1')">1</button><button onclick="addNumber('2')">2</button><button onclick="addNumber('3')">3</button><button class="operator" onclick="setOperator('+')">+</button>
+<button class="zero" onclick="addNumber('0')">0</button><button onclick="addNumber('.')">.</button><button class="equals" onclick="calculate()">=</button>
+</div>
+<div class="converter"><h3>Unit & Currency Converter</h3>
+<input type="number" id="conversionValue" placeholder="Enter value">
+<select id="conversionType"><option value="km-miles">Kilometers → Miles</option><option value="celsius-fahrenheit">Celsius → Fahrenheit</option><option value="usd-inr">USD → INR</option><option value="inr-usd">INR → USD</option></select>
+<button class="convert-btn" onclick="convert()">Convert</button><div class="result" id="conversionResult">Result will appear here</div>
+</div>
+<div class="footer">Built with Python Flask</div>
+</div></div>
+<script>
+let current="",firstNumber=null,operator=null;
+const display=document.getElementById("display"),previous=document.getElementById("previous");
+function updateDisplay(){display.innerText=current||"0"}
+function addNumber(number){if(number==="."&&current.includes("."))return;if(number==="%"&&current){current=String(parseFloat(current)/100);updateDisplay();return}current+=number;updateDisplay()}
+function setOperator(op){if(!current)return;firstNumber=parseFloat(current);operator=op;previous.innerText=firstNumber+" "+op;current=""}
+async function calculate(){if(firstNumber===null||!current||!operator)return;const secondNumber=parseFloat(current);try{const r=await fetch("/calculate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({num1:firstNumber,num2:secondNumber,operator})});const d=await r.json();if(d.error){display.innerText="Error";previous.innerText=d.error;return}current=String(d.result);previous.innerText=firstNumber+" "+operator+" "+secondNumber+" =";firstNumber=null;operator=null;updateDisplay()}catch(e){display.innerText="Error";previous.innerText="Server error"}}
+function clearCalculator(){current="";firstNumber=null;operator=null;previous.innerText="";updateDisplay()}
+function deleteNumber(){current=current.slice(0,-1);updateDisplay()}
+async function convert(){const value=document.getElementById("conversionValue").value,conversion=document.getElementById("conversionType").value,result=document.getElementById("conversionResult");if(!value){result.innerText="Please enter a value.";return}try{const r=await fetch("/convert",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({value,conversion})});const d=await r.json();result.innerText=d.error?d.error:"Result: "+d.result}catch(e){result.innerText="Server error."}}
+</script>
+</body>
+</html>
