@@ -1,32 +1,26 @@
-# Interactive Calculator & Unit Converter
+# Python Interactive Calculator
 
-A beginner-friendly Python CLI application that performs
-basic arithmetic operations, currency conversion, and unit conversion.
+A realistic calculator web application built with Python Flask, HTML, CSS and JavaScript.
 
 ## Features
-
-- Addition
-- Subtraction
-- Multiplication
-- Division
+- Addition, subtraction, multiplication and division
+- Divide-by-zero validation
+- Percentage, delete and clear
 - Kilometers to Miles
 - Celsius to Fahrenheit
-- USD to INR
-- INR to USD
-- Input validation
-- Error handling
-- Menu-driven interface
+- USD to INR and INR to USD
+- Responsive calculator-style UI
+- Python Flask backend
 
-## Technologies Used
-
-- Python 3
-- Functions
-- While Loops
-- Conditional Statements
-- Try/Except
-- User Input
-
-## How to Run
-
+## Run locally
 ```bash
-python3 calculator.py
+pip install -r requirements.txt
+python3 app.py
+```
+
+Open `http://127.0.0.1:5000`.
+
+## Deployment
+This project can be deployed as a Python Flask application on Vercel.
+
+> Note: USD/INR uses a fixed beginner-project rate of 83.50, not a live exchange-rate API.
